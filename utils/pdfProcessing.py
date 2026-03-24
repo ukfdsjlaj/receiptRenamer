@@ -1,3 +1,9 @@
+'''
+    This module contains the primary logic for processing PDF receipts, extracting key information using the Ollama API, and generat new filenames based on the extracted data.
+
+    Seongjun Yoo
+'''
+
 import re
 import json
 import base64

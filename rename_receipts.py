@@ -1,18 +1,19 @@
 """
-Receipt Auto-Renamer (Ollama Edition)
---------------------------------------
-Renames scanned receipt PDFs to: 1234 2024-03-23 StoreName.pdf
+    Receipt Auto-Renamer
+    --------------------------------------
+    Renames scanned receipt PDFs to: 1234 2024-03-23 StoreName.pdf
 
-- Automatically installs Ollama if not found
-- Automatically starts Ollama if not running
-- Automatically pulls llama3.2-vision if not downloaded
-- No API key needed — runs fully on your PC
+    - Automatically installs Ollama if not found
+    - Automatically starts Ollama if not running
+    - Automatically pulls llama3.2-vision if not downloaded
+    - No API key needed — runs fully on PC using Ondevice AI (Ollama)
+
+    Seongjun Yoo
 """
 
 import sys
 from pathlib import Path
 
-# Custom modules
 # Custom modules
 from utils import config, ollamaSetup, pdfProcessing
 
@@ -48,7 +49,6 @@ def main():
     print(f"Found {len(pdfs)} PDF(s)")
     print("Note: First receipt may be slow while model loads into memory.\n")
 
-    # Preview
     print("Preview (no files renamed yet):")
     print("-" * 40)
 

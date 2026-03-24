@@ -1,3 +1,8 @@
+'''
+    This code checks if Ollama is installed, and if not, it downloads and runs the installer. It then starts the Ollama server in the background and pulls the llama3.2-vision model if it's not already available.
+
+    Seongjun Yoo
+'''
 import os
 import sys
 import time
@@ -11,7 +16,6 @@ OLLAMA_INSTALLER = "https://ollama.com/download/OllamaSetup.exe"
 
 def is_ollama_installed() -> bool:
     """Check if ollama.exe exists anywhere on PATH or in common install locations."""
-    # Check PATH
     for path_dir in os.environ.get("PATH", "").split(os.pathsep):
         if Path(path_dir, "ollama.exe").exists():
             return True
@@ -77,6 +81,7 @@ def start_ollama():
             stderr=subprocess.DEVNULL,
             creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
         )
+        
         # Wait up to 15 seconds for it to become ready
         for i in range(15):
             time.sleep(1)
@@ -132,7 +137,7 @@ def ensure_ollama_ready():
     """Full setup: install if needed, start if needed, pull model if needed."""
     if not is_ollama_installed():
         download_ollama()
-        time.sleep(3)  # Give installer a moment
+        time.sleep(3)  
 
     if not is_ollama_running():
         start_ollama()

@@ -1,3 +1,10 @@
+'''
+    This code creates, reads, and updates a config.json file in the same directory as the executable or sbript.
+    The config file is used to store the folder path for the receipts.
+    
+    Seongjun Yoo
+'''
+
 import sys
 import json
 from pathlib import Path
