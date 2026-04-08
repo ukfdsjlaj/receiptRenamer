@@ -64,7 +64,9 @@ def main():
     skipped = 0
 
     for pdf in pdfs:
-        info  = pdfProcessing.extract_receipt_info(pdf)
+        known_cards = cfg.get("cards", [])
+        
+        info = pdfProcessing.extract_receipt_info(pdf, known_cards)
         card  = info.get("card")
         date  = info.get("date")
         store = info.get("store")

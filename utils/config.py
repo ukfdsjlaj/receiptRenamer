@@ -5,6 +5,7 @@
     Seongjun Yoo
 '''
 
+import re
 import sys
 import json
 from pathlib import Path
@@ -43,7 +44,7 @@ def setup_wizard(config: dict) -> dict:
     print(r"  Example: C:\Users\Exmaple\Done")
     while True:
         folder = input("  Folder path: ").strip().strip('"')
-        dest = input ("  Folder path: ").strip().strip('"')
+        dest = input ("  Destination path: ").strip().strip('"')
         if (folder and Path(folder).exists()) and (dest and Path(dest).exists()):
             config["folder"] = folder
             config["dest"] = dest
@@ -52,6 +53,15 @@ def setup_wizard(config: dict) -> dict:
             print(f"  Folder not found: {folder}. Please check and try again.")
         else:
             print("  Folder path cannot be empty.")
+    
+    print()
+    print("Frequent Card Numbers (Optional)")
+    print("  Enter the last 4 digits of your cards, separated by spaces or commas.")
+    print("  Example: 1234, 5678, 9012")
+    cards_input = input("  Cards (Press Enter to skip): ").strip()
+    
+    config["cards"] = [c for c in re.split(r'\D+', cards_input) if c]
+    
     print()
     save_config(config)
     return config
