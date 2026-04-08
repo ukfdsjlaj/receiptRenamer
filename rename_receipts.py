@@ -50,42 +50,51 @@ def main():
         input("\nPress Enter to exit...")
         return
 
-    pdfs = sorted(folder.glob("*.pdf"))
-    if not pdfs:
-        print(f"No PDF files found in: {folder}")
+    # Look for multiple file types instead of just PDFs
+    valid_extensions = [".pdf", ".jpg", ".jpeg", ".png"]
+    files_to_process = [p for p in folder.iterdir() if p.is_file() and p.suffix.lower() in valid_extensions]
+    
+    # Sort them alphabetically
+    files_to_process.sort()
+
+    if not files_to_process:
+        print(f"No receipts (PDF/JPG/PNG) found in: {folder}")
         input("\nPress Enter to exit...")
         return
 
-    print(f"Found {len(pdfs)} PDF(s)")
+    print(f"Found {len(files_to_process)} file(s)")
     print("Note: First receipt may be slow while model loads into memory.\n")
 
     existing_names = {p.name.lower() for p in dest.iterdir()}
     moved   = 0
     skipped = 0
 
-    for pdf in pdfs:
+    # Rename variable from 'pdf' to 'file_path' to be more accurate
+    for file_path in files_to_process:
         known_cards = cfg.get("cards", [])
+        info = pdfProcessing.extract_receipt_info(file_path, known_cards)
         
-        info = pdfProcessing.extract_receipt_info(pdf, known_cards)
         card  = info.get("card")
         date  = info.get("date")
         store = info.get("store")
 
         missing = [f for f, v in [("card", card), ("date", date), ("store", store)] if not v]
         if missing:
-            print(f"  SKIP {pdf.name} - could not read: {', '.join(missing)}")
+            print(f"  SKIP {file_path.name} - could not read: {', '.join(missing)}")
             skipped += 1
             continue
 
-        new_name = pdfProcessing.build_new_filename(card, date, store, existing_names)
+        # Pass the file's original extension into the renaming function
+        ext = file_path.suffix.lower()
+        new_name = pdfProcessing.build_new_filename(card, date, store, existing_names, ext)
         existing_names.add(new_name.lower())
 
         try:
-            pdf.rename(dest / new_name)
-            print(f"  {pdf.name} -> {new_name}")
+            file_path.rename(dest / new_name)
+            print(f"  {file_path.name} -> {new_name}")
             moved += 1
         except Exception as e:
-            print(f"  Failed to move {pdf.name}: {e}")
+            print(f"  Failed to move {file_path.name}: {e}")
             skipped += 1
 
     print()
