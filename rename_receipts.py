@@ -2,6 +2,7 @@
     Receipt Auto-Renamer
     --------------------------------------
     Renames scanned receipt PDFs to: 1234 2024-03-23 StoreName.pdf
+    and moves them to a destination folder.
 
     - Automatically installs Ollama if not found
     - Automatically starts Ollama if not running
@@ -27,15 +28,24 @@ def main():
 
     # Load or create config
     cfg = config.load_config()
-    if not cfg.get("folder"):
+    if not cfg.get("folder") or not cfg.get("dest"):
         cfg = config.setup_wizard(cfg)
     else:
-        print(f"Folder : {cfg['folder']}")
-        print("(Delete config.json to change folder)\n")
+        print(f"Source      : {cfg['folder']}")
+        print(f"Destination : {cfg['dest']}")
+        print("(Delete config.json to change folders)\n")
 
     folder = Path(cfg["folder"])
+    dest   = Path(cfg["dest"])
+
     if not folder.exists():
-        print(f"Receipts folder not found: {folder}")
+        print(f"Source folder not found: {folder}")
+        print("Delete config.json and run again.")
+        input("\nPress Enter to exit...")
+        return
+
+    if not dest.exists():
+        print(f"Destination folder not found: {dest}")
         print("Delete config.json and run again.")
         input("\nPress Enter to exit...")
         return
@@ -49,14 +59,12 @@ def main():
     print(f"Found {len(pdfs)} PDF(s)")
     print("Note: First receipt may be slow while model loads into memory.\n")
 
-    print("Preview (no files renamed yet):")
-    print("-" * 40)
-
-    existing_names = {p.name.lower() for p in folder.iterdir()}
-    planned = []
+    existing_names = {p.name.lower() for p in dest.iterdir()}
+    moved   = 0
+    skipped = 0
 
     for pdf in pdfs:
-        info = pdfProcessing.extract_receipt_info(pdf)
+        info  = pdfProcessing.extract_receipt_info(pdf)
         card  = info.get("card")
         date  = info.get("date")
         store = info.get("store")
@@ -64,40 +72,24 @@ def main():
         missing = [f for f, v in [("card", card), ("date", date), ("store", store)] if not v]
         if missing:
             print(f"  SKIP {pdf.name} - could not read: {', '.join(missing)}")
-            planned.append((pdf, None))
+            skipped += 1
             continue
 
         new_name = pdfProcessing.build_new_filename(card, date, store, existing_names)
         existing_names.add(new_name.lower())
-        print(f"  {pdf.name}")
-        print(f"    -> {new_name}")
-        planned.append((pdf, new_name))
 
-    to_rename = [(p, n) for p, n in planned if n]
-    skipped   = len(planned) - len(to_rename)
-
-    print()
-    print(f"Ready to rename {len(to_rename)} file(s). {skipped} will be skipped.")
-    print()
-
-    confirm = input("Proceed with renaming? (y/n): ").strip().lower()
-    if confirm != "y":
-        print("Cancelled. No files were renamed.")
-        input("\nPress Enter to exit...")
-        return
-
-    renamed = 0
-    for pdf_path, new_name in to_rename:
         try:
-            pdf_path.rename(pdf_path.parent / new_name)
-            print(f"  Renamed: {pdf_path.name} -> {new_name}")
-            renamed += 1
+            pdf.rename(dest / new_name)
+            print(f"  {pdf.name} -> {new_name}")
+            moved += 1
         except Exception as e:
-            print(f"  Failed to rename {pdf_path.name}: {e}")
+            print(f"  Failed to move {pdf.name}: {e}")
+            skipped += 1
 
     print()
-    print(f"Done. {renamed} file(s) renamed, {skipped} skipped.")
+    print(f"Done. {moved} file(s) renamed and moved, {skipped} skipped.")
     input("\nPress Enter to exit...")
+
 
 if __name__ == "__main__":
     main()

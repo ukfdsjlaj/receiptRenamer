@@ -37,12 +37,16 @@ def setup_wizard(config: dict) -> dict:
     print("=" * 50)
     print()
     print("Receipts Folder")
-    print(r"  Example: C:\Users\jjunn\OneDrive\Receipts")
+    print(r"  Example: C:\Users\Example\Receipts")
     print()
+    print("Destination Folder")
+    print(r"  Example: C:\Users\Exmaple\Done")
     while True:
         folder = input("  Folder path: ").strip().strip('"')
-        if folder and Path(folder).exists():
+        dest = input ("  Folder path: ").strip().strip('"')
+        if (folder and Path(folder).exists()) and (dest and Path(dest).exists()):
             config["folder"] = folder
+            config["dest"] = dest
             break
         elif folder:
             print(f"  Folder not found: {folder}. Please check and try again.")
