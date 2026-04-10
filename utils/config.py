@@ -10,6 +10,7 @@ import sys
 import json
 from pathlib import Path
 
+# Path building
 def get_config_path() -> Path:
     if getattr(sys, "frozen", False):
         base = Path(sys.executable).parent
@@ -17,6 +18,7 @@ def get_config_path() -> Path:
         base = Path(__file__).parent
     return base / "config.json"
 
+# Check if config file exist, if not create one
 def load_config() -> dict:
     path = get_config_path()
     if path.exists():
@@ -31,6 +33,7 @@ def save_config(config: dict):
     with open(get_config_path(), "w") as f:
         json.dump(config, f, indent=2)
     print(f"  Settings saved to: {get_config_path()}\n")
+
 
 def setup_wizard(config: dict) -> dict:
     print("=" * 50)

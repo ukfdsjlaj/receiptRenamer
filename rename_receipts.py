@@ -1,7 +1,7 @@
 """
     Receipt Auto-Renamer
     --------------------------------------
-    Renames scanned receipt PDFs to: 1234 2024-03-23 StoreName.pdf
+    Renames scanned receipt file to: 1234 2024-03-23 StoreName.fileExtension
     and moves them to a destination folder.
 
     - Automatically installs Ollama if not found
@@ -23,7 +23,7 @@ def main():
     print("=" * 50)
     print()
 
-    # Ensure Ollama is installed, running, and model is ready
+    # Ensure Ollama is installed and fully funcitoning
     ollamaSetup.ensure_ollama_ready()
 
     # Load or create config
@@ -50,7 +50,6 @@ def main():
         input("\nPress Enter to exit...")
         return
 
-    # Look for multiple file types instead of just PDFs
     valid_extensions = [".pdf", ".jpg", ".jpeg", ".png"]
     files_to_process = [p for p in folder.iterdir() if p.is_file() and p.suffix.lower() in valid_extensions]
     
@@ -69,22 +68,22 @@ def main():
     moved   = 0
     skipped = 0
 
-    # Rename variable from 'pdf' to 'file_path' to be more accurate
     for file_path in files_to_process:
         known_cards = cfg.get("cards", [])
-        info = pdfProcessing.extract_receipt_info(file_path, known_cards)
+        info = pdfProcessing.extract_receipt_info(file_path, known_cards) # Pass the file to AI
         
         card  = info.get("card")
         date  = info.get("date")
         store = info.get("store")
 
+        # Skip if any of one info is missing
         missing = [f for f, v in [("card", card), ("date", date), ("store", store)] if not v]
         if missing:
             print(f"  SKIP {file_path.name} - could not read: {', '.join(missing)}")
             skipped += 1
             continue
 
-        # Pass the file's original extension into the renaming function
+        # Rename but keep the original extension
         ext = file_path.suffix.lower()
         new_name = pdfProcessing.build_new_filename(card, date, store, existing_names, ext)
         existing_names.add(new_name.lower())
@@ -101,6 +100,6 @@ def main():
     print(f"Done. {moved} file(s) renamed and moved, {skipped} skipped.")
     input("\nPress Enter to exit...")
 
-
+# RUNNNNNNN
 if __name__ == "__main__":
     main()

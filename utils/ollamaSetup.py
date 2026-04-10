@@ -14,8 +14,7 @@ import requests
 OLLAMA_MODEL = "llama3.2-vision"
 OLLAMA_INSTALLER = "https://ollama.com/download/OllamaSetup.exe"
 
-def is_ollama_installed() -> bool:
-    """Check if ollama.exe exists anywhere on PATH or in common install locations."""
+def ollama_installed() -> bool:
     for path_dir in os.environ.get("PATH", "").split(os.pathsep):
         if Path(path_dir, "ollama.exe").exists():
             return True
@@ -71,7 +70,6 @@ def is_ollama_running() -> bool:
         return False
 
 def start_ollama():
-    """Start Ollama server in the background."""
     print("Starting Ollama in the background...")
     ollama_exe = get_ollama_exe()
     try:
@@ -99,8 +97,7 @@ def start_ollama():
         input("\nPress Enter to exit...")
         sys.exit(1)
 
-def is_model_available() -> bool:
-    """Check if llama3.2-vision is already pulled."""
+def check_model() -> bool:
     try:
         r = requests.get("http://localhost:11434/api/tags", timeout=5)
         models = r.json().get("models", [])
@@ -109,8 +106,7 @@ def is_model_available() -> bool:
         return False
 
 def pull_model():
-    """Pull the vision model, showing progress."""
-    print(f"Downloading vision model: {OLLAMA_MODEL} (~2GB, one-time download)...")
+    print(f"Downloading vision model: {OLLAMA_MODEL}")
     ollama_exe = get_ollama_exe()
     try:
         process = subprocess.Popen(
@@ -133,14 +129,14 @@ def pull_model():
         input("\nPress Enter to exit...")
         sys.exit(1)
 
+
 def ensure_ollama_ready():
-    """Full setup: install if needed, start if needed, pull model if needed."""
-    if not is_ollama_installed():
+    if not ollama_installed():
         download_ollama()
         time.sleep(3)  
 
     if not is_ollama_running():
         start_ollama()
 
-    if not is_model_available():
+    if not check_model():
         pull_model()

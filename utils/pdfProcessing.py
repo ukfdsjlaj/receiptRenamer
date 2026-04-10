@@ -40,7 +40,7 @@ def extract_receipt_info(file_path: Path, known_cards: list = None) -> dict:
     print(f"  Reading: {file_path.name}")
     image_b64 = file_to_base64(file_path)
 
-    # 1. Build the dynamic hint section
+    # If the frequently used card list is given, give it to AI
     hint_section = ""
     if known_cards:
         cards_string = ", ".join(known_cards)
@@ -50,7 +50,7 @@ The payment was almost certainly made with one of these cards: {cards_string}.
 If you see a card number on the receipt that looks visually similar to one of these, output the exact matching number from this list.
 """
 
-    # 2. THE PROMPT (Notice this is NOT indented inside the 'if' block above)
+    # Prompt to be given to the AI
     prompt = f"""Look at this receipt image and extract:
 1. The last 4 digits of the card used for payment
 2. The date of the transaction
@@ -95,14 +95,14 @@ Rules, MUST BE FOLLOWED FOR CONSISTENT FORMAT:
         print(f"  Error processing {file_path.name}: {e}")
         return {"card": None, "date": None, "store": None}
     
-def sanitize_filename(name: str) -> str:
+def stripedFilename(name: str) -> str:
     return re.sub(r'[<>:"/\\|?*]', "", name).strip()
 
 def build_new_filename(card: str, date: str, store: str, existing: set, ext: str) -> str:
     clean_date = str(date).replace("/", "-").replace("\\", "-")
-    base = f"{sanitize_filename(card)} {clean_date} {sanitize_filename(store)}"
+    base = f"{stripedFilename(card)} {clean_date} {stripedFilename(store)}"
     
-    # Use the original extension (.jpg, .pdf, etc.) instead of hardcoding .pdf
+    # Keep the extension
     candidate = base + ext
     counter = 1
     while candidate.lower() in existing:
