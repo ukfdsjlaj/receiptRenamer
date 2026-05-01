@@ -52,8 +52,8 @@ If you see a card number on the receipt that looks visually similar to one of th
 
     # Prompt to be given to the AI
     prompt = f"""Look at this receipt image and extract:
-1. The last 4 digits of the card used for payment
-2. The date of the transaction
+1. The last 4 digits of the card used for payment. Often found with **** or xxxx before it. If such patterns are not found, look for visa, mastercard, amex, etc. and extract the last 4 digits.
+2. The date of the transaction IMPORTANT: Date must be in YYYY-MM-DD format
 3. The store or business name
 {hint_section}
 Respond ONLY with a JSON object in this exact format, nothing else:
