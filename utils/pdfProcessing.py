@@ -52,9 +52,18 @@ If you see a card number on the receipt that looks visually similar to one of th
 
     # Prompt to be given to the AI
     prompt = f"""Look at this receipt image and extract:
-1. The last 4 digits of the card used for payment. Often found with **** or xxxx before it. If such patterns are not found, look for visa, mastercard, amex, etc. and extract the last 4 digits.
-2. The date of the transaction IMPORTANT: Date must be in YYYY-MM-DD format
+Rules, MUST BE FOLLOWED FOR CONSISTENT FORMAT:
+- card must be exactly the last 4 digits of the card number shown on the receipt (e.g. "1234)
+- date must be in YYYY-MM-DD format. (e.g. "2026-05-31")
+- store should be short (1-3 words max), no special characters except hyphens
+- Replace spaces in store name with hyphens (e.g. "Tim Hortons" -> "Tim-Hortons")
+- If you cannot find date or store field, use null for that field
+- If you cannot find card number, use "0000" for that field
+
+1. The last 4 digits of the card used for payment. 
+2. The date of the transaction
 3. The store or business name
+
 {hint_section}
 Respond ONLY with a JSON object in this exact format, nothing else:
 {{
@@ -62,13 +71,7 @@ Respond ONLY with a JSON object in this exact format, nothing else:
   "date": "YYYY-MM-DD",
   "store": "StoreName"
 }}
-
-Rules, MUST BE FOLLOWED FOR CONSISTENT FORMAT:
-- card must be exactly the last 4 digits of the card number shown on the receipt
-- date must be in YYYY-MM-DD format. 
-- store should be short (1-3 words max), no special characters except hyphens
-- Replace spaces in store name with hyphens (e.g. "Tim Hortons" -> "Tim-Hortons")
-- If you cannot find any field, use null for that field"""
+"""
 
     payload = {
         "model": OLLAMA_MODEL,
