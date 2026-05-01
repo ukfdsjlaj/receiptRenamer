@@ -34,6 +34,15 @@ def save_config(config: dict):
         json.dump(config, f, indent=2)
     print(f"  Settings saved to: {get_config_path()}\n")
 
+# Create folders for each card number and a "others" folder in the destination directory
+def create_folders(config: dict):
+    parent_directory = Path(config["dest"])
+    for card in config.get("cards"):
+        if card:
+            Path(parent_directory / card).mkdir(parents=True, exist_ok=True)
+    
+    Path(parent_directory / "others").mkdir(parents=True, exist_ok=True)
+
 
 def setup_wizard(config: dict) -> dict:
     print("=" * 50)
@@ -57,14 +66,16 @@ def setup_wizard(config: dict) -> dict:
         else:
             print("  Folder path cannot be empty.")
     
+
     print()
-    print("Frequent Card Numbers (Optional)")
-    print("  Enter the last 4 digits of your cards, separated by spaces or commas.")
-    print("  Example: 1234, 5678, 9012")
+    print("Frequent Card Numbers (Optional, this will create folders for each card number + others folder)")
+    print("  Enter the last 4 digits of your cards, separated by commas.")
+    print("  Example: 1234,5678,9012")
     cards_input = input("  Cards (Press Enter to skip): ").strip()
     
-    config["cards"] = [c for c in re.split(r'\D+', cards_input) if c]
+    config["cards"] = [c.strip() for c in cards_input.split(",")]
     
     print()
     save_config(config)
+    create_folders(config)
     return config

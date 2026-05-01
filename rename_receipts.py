@@ -64,7 +64,6 @@ def main():
     print(f"Found {len(files_to_process)} file(s)")
     print("Note: First receipt may be slow while model loads into memory.\n")
 
-    existing_names = {p.name.lower() for p in dest.iterdir()}
     moved   = 0
     skipped = 0
 
@@ -83,14 +82,20 @@ def main():
             skipped += 1
             continue
 
+        # Choose the destination folder: exact card folder or fallback to "others"
+        target_folder = dest / card
+        if not target_folder.is_dir():
+            target_folder = dest / "others"
+        target_folder.mkdir(parents=True, exist_ok=True)
+
         # Rename but keep the original extension
         ext = file_path.suffix.lower()
+        existing_names = {p.name.lower() for p in target_folder.iterdir() if p.is_file()}
         new_name = pdfProcessing.build_new_filename(card, date, store, existing_names, ext)
-        existing_names.add(new_name.lower())
 
         try:
-            file_path.rename(dest / new_name)
-            print(f"  {file_path.name} -> {new_name}")
+            file_path.rename(target_folder / new_name)
+            print(f"  {file_path.name} -> {target_folder.name}/{new_name}")
             moved += 1
         except Exception as e:
             print(f"  Failed to move {file_path.name}: {e}")
