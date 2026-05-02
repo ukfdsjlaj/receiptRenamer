@@ -104,9 +104,9 @@ Respond ONLY with a JSON object in this exact format, nothing else:
 def stripedFilename(name: str) -> str:
     return re.sub(r'[<>:"/\\|?*]', "", name).strip()
 
-def build_new_filename(card: str, date: str, store: str, existing: set, ext: str) -> str:
+def build_new_filename(card: str, date: str, store: str, amount: str, existing: set, ext: str) -> str:
     clean_date = str(date).replace("/", "-").replace("\\", "-")
-    base = f"{stripedFilename(card)} {clean_date} {stripedFilename(store)}"
+    base = f"{stripedFilename(card)} {clean_date} {stripedFilename(store)} {amount}"
     
     # Keep the extension
     candidate = base + ext
