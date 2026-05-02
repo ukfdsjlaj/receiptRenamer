@@ -68,15 +68,17 @@ def main():
     skipped = 0
 
     for file_path in files_to_process:
+        print(f"Progress: {moved + skipped + 1}/{len(files_to_process)}\nskipped: {skipped}\nmoved: {moved}")
         known_cards = cfg.get("cards", [])
         info = pdfProcessing.extract_receipt_info(file_path, known_cards) # Pass the file to AI
         
         card  = info.get("card")
         date  = info.get("date")
         store = info.get("store")
+        amount = info.get("totalAmount")
 
         # Skip if any of one info is missing
-        missing = [f for f, v in [("card", card), ("date", date), ("store", store)] if not v]
+        missing = [f for f, v in [("card", card), ("date", date), ("store", store), ("totalAmount", amount)] if not v]
         if missing:
             print(f"  SKIP {file_path.name} - could not read: {', '.join(missing)}")
             skipped += 1
@@ -91,7 +93,7 @@ def main():
         # Rename but keep the original extension
         ext = file_path.suffix.lower()
         existing_names = {p.name.lower() for p in target_folder.iterdir() if p.is_file()}
-        new_name = pdfProcessing.build_new_filename(card, date, store, existing_names, ext)
+        new_name = pdfProcessing.build_new_filename(card, date, store, amount, existing_names, ext)
 
         try:
             file_path.rename(target_folder / new_name)

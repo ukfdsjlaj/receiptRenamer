@@ -46,30 +46,33 @@ def extract_receipt_info(file_path: Path, known_cards: list = None) -> dict:
         cards_string = ", ".join(known_cards)
         hint_section = f"""
 CRITICAL HINT FOR CARD NUMBER:
-The payment was almost certainly made with one of these cards: {cards_string}. 
-If you see a card number on the receipt that looks visually similar to one of these, output the exact matching number from this list.
+Those are the 4 digits of card that are frequently used: {cards_string}. 
+If you find a 4 digit number on the receipt that matches one of these, prioritize that as the "card" value.
 """
 
     # Prompt to be given to the AI
-    prompt = f"""Look at this receipt image and extract:
-Rules, MUST BE FOLLOWED FOR CONSISTENT FORMAT:
-- card must be exactly the last 4 digits of the card number shown on the receipt (e.g. "1234)
-- date must be in YYYY-MM-DD format. (e.g. "2026-05-31")
-- store should be short (1-3 words max), no special characters except hyphens
-- Replace spaces in store name with hyphens (e.g. "Tim Hortons" -> "Tim-Hortons")
-- If you cannot find date or store field, use null for that field
-- If you cannot find card number, use "0000" for that field
+    prompt = f"""You are an expert data extraction assistant. Analyze the provided receipt image and extract the following information into a strict JSON object.
 
-1. The last 4 digits of the card used for payment. 
-2. The date of the transaction
-3. The store or business name
+Fields to extract:
+1. "card": The final 4 digits of the payment card. If cash was used or it cannot be found, return 0000.
+2. "date": The date of the transaction. You MUST standardize this to "YYYY-MM-DD" format. If the receipt shows a 2-digit year (e.g., DD/MM/YY), you must convert it to a 4-digit year by adding "20" to the front (e.g., "23" becomes "2023").
+3. "store": The name of the business or store. Keep it concise (e.g., "Walmart", not "Walmart Supercenter #1234").
+4. "totalAmount": The final total amount paid. Return as a number (e.g., 12.99). Do not include currency symbols like "$".
+
+CRITICAL RULES:
+- Respond ONLY with the raw JSON object.
+- Do not wrap the response in markdown blocks (e.g., do not use ```json).
+- Do not include any greetings, explanations, or conversational text.
+- If a specific piece of information cannot be found on the receipt, use null for that field.
+
 
 {hint_section}
 Respond ONLY with a JSON object in this exact format, nothing else:
 {{
   "card": "1234",
   "date": "YYYY-MM-DD",
-  "store": "StoreName"
+  "store": "StoreName",
+  "totalAmount": 24.50
 }}
 """
 
