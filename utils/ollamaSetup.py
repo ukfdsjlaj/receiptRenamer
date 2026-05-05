@@ -11,7 +11,7 @@ import urllib.request
 from pathlib import Path
 import requests
 
-OLLAMA_MODEL = "Qwen2.5-VL:7B"
+OLLAMA_MODEL = "qwen2.5-vl:7b"
 OLLAMA_INSTALLER = "https://ollama.com/download/OllamaSetup.exe"
 
 def ollama_installed() -> bool:
