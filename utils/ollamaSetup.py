@@ -11,7 +11,7 @@ import urllib.request
 from pathlib import Path
 import requests
 
-OLLAMA_MODEL = "llama3.2-vision"
+OLLAMA_MODEL = "Qwen2.5-VL:7B"
 OLLAMA_INSTALLER = "https://ollama.com/download/OllamaSetup.exe"
 
 def ollama_installed() -> bool:
@@ -113,7 +113,8 @@ def pull_model():
             [ollama_exe, "pull", OLLAMA_MODEL],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            text=True
+            text=True,
+            encoding="utf-8"
         )
         for line in process.stdout:
             line = line.strip()

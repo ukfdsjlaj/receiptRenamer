@@ -51,7 +51,12 @@ If you find a 4 digit number on the receipt that matches one of these, prioritiz
 """
 
     # Prompt to be given to the AI
-    prompt = f"""You are an expert data extraction assistant. Analyze the provided receipt image and extract the following information into a strict JSON object.
+    prompt = f"""You are a speialized OCR agent for financial documents.
+Aanalyze the receipt image and follow these steps internally:
+1. Identify the Store Name from the header.
+2. Locate the Date and normalize it to "YYYY-MM-DD" format. if YY is provided, use 20YY.
+3. Search for card transaction details. The card number is always represented by the last 4 digits. (Look for 'Card', 'Visa', 'Entry', 'xxxx' or '****').
+4. Find the final Total Amount (After tax and tips).
 
 Fields to extract:
 1. "card": The final 4 digits of the payment card. If cash was used or it cannot be found, return 0000.
@@ -63,8 +68,7 @@ CRITICAL RULES:
 - Respond ONLY with the raw JSON object.
 - Do not wrap the response in markdown blocks (e.g., do not use ```json).
 - Do not include any greetings, explanations, or conversational text.
-- If a specific piece of information cannot be found on the receipt, use null for that field.
-
+- If a specific piece of information cannot be found on the receipt, use null for that field. if the card number cannot be found, use "0000".
 
 {hint_section}
 Respond ONLY with a JSON object in this exact format, nothing else:
