@@ -89,7 +89,7 @@ Respond ONLY with a JSON object in this exact format, nothing else:
     }
 
     try:
-        response = requests.post(OLLAMA_URL, json=payload, timeout=120)
+        response = requests.post(OLLAMA_URL, json=payload, timeout=600)
         response.raise_for_status()
         raw = response.json().get("response", "").strip()
         raw = re.sub(r"```json|```", "", raw).strip()
