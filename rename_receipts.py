@@ -6,7 +6,7 @@
 
     - Automatically installs Ollama if not found
     - Automatically starts Ollama if not running
-    - Automatically pulls llama3.2-vision if not downloaded
+    - Automatically pulls the model if not downloaded
     - No API key needed — runs fully on PC using Ondevice AI (Ollama)
 
     Seongjun Yoo
@@ -88,10 +88,20 @@ def main():
             skipped += 1
             continue
 
-        # Choose the destination folder: exact card folder or fallback to "others"
-        target_folder = dest / card
-        if not target_folder.is_dir():
-            target_folder = dest / "others"
+        storeNames = cfg.get("stores", [])
+
+        cardFolder = dest / card 
+        if not cardFolder.is_dir():
+            cardFolder = dest / "others"
+        # Just to be safe
+        cardFolder.mkdir(parents=True, exist_ok=True)
+
+        # Check if the extracted store is in your approved list
+        if store in storeNames:
+            target_folder = cardFolder / store
+        else:
+            target_folder = cardFolder / "unknown_store"
+        # Same here, just being extra careful
         target_folder.mkdir(parents=True, exist_ok=True)
 
         # Rename but keep the original extension
