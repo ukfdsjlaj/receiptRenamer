@@ -19,6 +19,10 @@ from pathlib import Path
 from utils import config, ollamaSetup, pdfProcessing
 
 def main():
+    # Ensure the folder structure is ready. Create card folders and store folders if not exist.
+    config.create_folders(config.load_config())
+    config.create_store_folders(config.load_config())
+
     print("Receipt Auto-Renamer")
     print("=" * 50)
     print()

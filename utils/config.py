@@ -43,26 +43,36 @@ def create_folders(config: dict):
     
     Path(parent_directory / "others").mkdir(parents=True, exist_ok=True)
 
+def create_store_folders(config: dict):
+    parent_directory = Path(config["dest"])
+
+    for card in config.get("cards"):
+        if card:
+            for store in config.get("stores"):
+                if store:
+                    Path(parent_directory / card / store).mkdir(parents=True, exist_ok=True)
+
+
 
 def setup_wizard(config: dict) -> dict:
     print("=" * 50)
     print("  Receipt Auto-Renamer - First Time Setup")
     print("=" * 50)
     print()
-    print("Receipts Folder")
+    print("Source Folder")
     print(r"  Example: C:\Users\Example\Receipts")
     print()
     print("Destination Folder")
     print(r"  Example: C:\Users\Exmaple\Done")
     while True:
-        folder = input("  Folder path: ").strip().strip('"')
+        source = input("  Source path: ").strip().strip('"')
         dest = input ("  Destination path: ").strip().strip('"')
-        if (folder and Path(folder).exists()) and (dest and Path(dest).exists()):
-            config["folder"] = folder
+        if (source and Path(source).exists()) and (dest and Path(dest).exists()):
+            config["source"] = source
             config["dest"] = dest
             break
-        elif folder:
-            print(f"  Folder not found: {folder}. Please check and try again.")
+        elif source:
+            print(f"  Folder not found: {source}. Please check and try again.")
         else:
             print("  Folder path cannot be empty.")
     
@@ -71,11 +81,18 @@ def setup_wizard(config: dict) -> dict:
     print("Frequent Card Numbers (Optional, this will create folders for each card number + others folder)")
     print("  Enter the last 4 digits of your cards, separated by commas.")
     print("  Example: 1234,5678,9012")
-    cards_input = input("  Cards (Press Enter to skip): ").strip()
+    cardNumbers = input("  Cards (Press Enter to skip): ").strip()
+
+    print()
+    print("Subfolder naming: (Optional, this will create folders named after store to separate receipts by store)")
+    print("  Enter the store names, separated by commas.\n Example: Walmart, Sobeys, ... ")
+    storeNames = input(" Store names (Press Enter to skip): ").strip()
     
-    config["cards"] = [c.strip() for c in cards_input.split(",")]
+    config["cards"] = [c.strip() for c in cardNumbers.split(",")]
+    config["stores"] = [s.strip() for s in storeNames.split(",")]
     
     print()
     save_config(config)
     create_folders(config)
+    create_store_folders(config)
     return config

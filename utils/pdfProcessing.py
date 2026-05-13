@@ -17,7 +17,7 @@ OLLAMA_URL = "http://localhost:11434/api/generate"
 def file_to_base64(file_path: Path) -> str:
     ext = file_path.suffix.lower()
     
-    # If it's a PDF, extract the first page like before
+    # .pdf
     if ext == ".pdf":
         doc = fitz.open(str(file_path))
         page = doc[0]
@@ -26,7 +26,7 @@ def file_to_base64(file_path: Path) -> str:
         doc.close()
         return base64.b64encode(img_bytes).decode("utf-8")
         
-    # If it's an image, just read the raw file directly!
+    # other formats
     elif ext in [".jpg", ".jpeg", ".png"]:
         with open(file_path, "rb") as f:
             return base64.b64encode(f.read()).decode("utf-8")
@@ -80,7 +80,7 @@ Respond ONLY with a JSON object in this exact format, nothing else:
 }}
 """
 
-    payload = {
+    nameData = {
         "model": OLLAMA_MODEL,
         "prompt": prompt,
         "images": [image_b64],
@@ -89,7 +89,7 @@ Respond ONLY with a JSON object in this exact format, nothing else:
     }
 
     try:
-        response = requests.post(OLLAMA_URL, json=payload, timeout=600)
+        response = requests.post(OLLAMA_URL, json=nameData, timeout=600)
         response.raise_for_status()
         raw = response.json().get("response", "").strip()
         raw = re.sub(r"```json|```", "", raw).strip()
