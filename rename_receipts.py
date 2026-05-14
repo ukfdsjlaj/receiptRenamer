@@ -78,7 +78,7 @@ def main():
         
         card  = info.get("card")
         date  = info.get("date")
-        store = info.get("store")
+        store = info.get("store").replace("-","").replace(" ","").lower()
         amount = info.get("totalAmount")
 
         # Skip if any of one info is missing
@@ -90,6 +90,8 @@ def main():
 
         storeNames = cfg.get("stores", [])
 
+        normalizedStoreNames = {s.replace("-","").replace(" ","").lower(): s for s in storeNames}
+
         cardFolder = dest / card 
         if not cardFolder.is_dir():
             cardFolder = dest / "others"
@@ -97,8 +99,8 @@ def main():
         cardFolder.mkdir(parents=True, exist_ok=True)
 
         # Check if the extracted store is in your approved list
-        if store in storeNames:
-            target_folder = cardFolder / store
+        if store in normalizedStoreNames.keys():
+            target_folder = cardFolder / normalizedStoreNames[store]
         else:
             target_folder = cardFolder / "unknown_store"
         # Same here, just being extra careful

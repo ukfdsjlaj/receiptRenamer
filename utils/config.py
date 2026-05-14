@@ -51,6 +51,10 @@ def create_store_folders(config: dict):
             for store in config.get("stores"):
                 if store:
                     Path(parent_directory / card / store).mkdir(parents=True, exist_ok=True)
+            
+    Path(parent_directory / "others" / "unknown_store").mkdir(parents=True, exist_ok=True)
+    for store in config.get("stores"):
+        Path(parent_directory / "others" / store).mkdir(parents=True, exist_ok=True)
 
 
 
