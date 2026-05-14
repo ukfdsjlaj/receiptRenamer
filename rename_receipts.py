@@ -78,8 +78,10 @@ def main():
         
         card  = info.get("card")
         date  = info.get("date")
-        store = info.get("store").replace("-","").replace(" ","").lower()
+        store = info.get("store")
         amount = info.get("totalAmount")
+
+        normalizedstore = store.replace("-","").replace(" ","").lower()
 
         # Skip if any of one info is missing
         missing = [f for f, v in [("card", card), ("date", date), ("store", store), ("totalAmount", amount)] if not v]
@@ -99,7 +101,7 @@ def main():
         cardFolder.mkdir(parents=True, exist_ok=True)
 
         # Check if the extracted store is in your approved list
-        if store in narmalizedToOriginalStoreName.keys():
+        if normalizedstore in narmalizedToOriginalStoreName.keys():
             target_folder = cardFolder / narmalizedToOriginalStoreName[store]
         else:
             target_folder = cardFolder / "unknown_store"
