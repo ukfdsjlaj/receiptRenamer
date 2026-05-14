@@ -65,6 +65,7 @@ Fields to extract:
 4. "totalAmount": The final total amount paid. Return as a number (e.g., 12.99). Do not include currency symbols like "$".
 
 CRITICAL RULES:
+- Store name must be normalized, for example, Real Atlantic Superstore -> Superstore, Macquarrie's Meats LTD -> Macquarrie's, Kays Fresh Market or Kays Wholesales -> Kays. Normalize it so only the store name is presented.
 - Respond ONLY with the raw JSON object.
 - Do not wrap the response in markdown blocks (e.g., do not use ```json).
 - Do not include any greetings, explanations, or conversational text.
