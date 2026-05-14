@@ -19,10 +19,6 @@ from pathlib import Path
 from utils import config, ollamaSetup, pdfProcessing
 
 def main():
-    # Ensure the folder structure is ready. Create card folders and store folders if not exist.
-    config.create_folders(config.load_config())
-    config.create_store_folders(config.load_config())
-
     print("Receipt Auto-Renamer")
     print("=" * 50)
     print()
@@ -53,6 +49,10 @@ def main():
         print("Delete config.json and run again.")
         input("\nPress Enter to exit...")
         return
+    
+    # Ensure the folder structure is ready. Create card folders and store folders if not exist.
+    config.create_folders(config.load_config())
+    config.create_store_folders(config.load_config())
 
     valid_extensions = [".pdf", ".jpg", ".jpeg", ".png"]
     files_to_process = [p for p in folder.iterdir() if p.is_file() and p.suffix.lower() in valid_extensions]
