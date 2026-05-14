@@ -90,7 +90,7 @@ def main():
 
         storeNames = cfg.get("stores", [])
 
-        normalizedStoreNames = {s.replace("-","").replace(" ","").lower(): s for s in storeNames}
+        narmalizedToOriginalStoreName = {s.replace("-","").replace(" ","").lower(): s for s in storeNames}
 
         cardFolder = dest / card 
         if not cardFolder.is_dir():
@@ -99,8 +99,8 @@ def main():
         cardFolder.mkdir(parents=True, exist_ok=True)
 
         # Check if the extracted store is in your approved list
-        if store in normalizedStoreNames.keys():
-            target_folder = cardFolder / normalizedStoreNames[store]
+        if store in narmalizedToOriginalStoreName.keys():
+            target_folder = cardFolder / narmalizedToOriginalStoreName[store]
         else:
             target_folder = cardFolder / "unknown_store"
         # Same here, just being extra careful
