@@ -74,14 +74,14 @@ def main():
     for file_path in files_to_process:
         print(f"Progress: {moved + skipped + 1}/{len(files_to_process)}\nskipped: {skipped}\nmoved: {moved}")
         known_cards = cfg.get("cards", [])
-        info = pdfProcessing.extract_receipt_info(file_path, known_cards) # Pass the file to AI
+        info = pdfProcessing.extract_receipt_info(file_path, known_cards)
         
         card  = info.get("card")
         date  = info.get("date")
         store = info.get("store")
         amount = info.get("totalAmount")
 
-        normalizedstore = store.replace("-","").replace(" ","").lower()
+        normalizedStore = store.replace("-","").replace(" ","").replace("'", "").lower()
 
         # Skip if any of one info is missing
         missing = [f for f, v in [("card", card), ("date", date), ("store", store), ("totalAmount", amount)] if not v]
@@ -91,8 +91,7 @@ def main():
             continue
 
         storeNames = cfg.get("stores", [])
-
-        narmalizedToOriginalStoreName = {s.replace("-","").replace(" ","").lower(): s for s in storeNames}
+        normalizedToOriginalStoreName = {s.replace("-","").replace(" ","").replace("'", "").lower(): s for s in storeNames}
 
         cardFolder = dest / card 
         if not cardFolder.is_dir():
@@ -100,11 +99,11 @@ def main():
         # Just to be safe
         cardFolder.mkdir(parents=True, exist_ok=True)
 
-        # Check if the extracted store is in your approved list
-        if normalizedstore in narmalizedToOriginalStoreName.keys():
-            target_folder = cardFolder / narmalizedToOriginalStoreName[store]
-        else:
-            target_folder = cardFolder / "unknown_store"
+        target_folder = cardFolder / "unknown_store"
+        for storeName in normalizedToOriginalStoreName.keys():
+            if normalizedStore in storeName:
+                target_folder = cardFolder / normalizedToOriginalStoreName[storeName]
+                break
         # Same here, just being extra careful
         target_folder.mkdir(parents=True, exist_ok=True)
 

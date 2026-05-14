@@ -90,7 +90,7 @@ def setup_wizard(config: dict) -> dict:
     cardNumbers = input("  Cards (Press Enter to skip): ").strip()
 
     print()
-    print("Subfolder naming: (Optional, this will create folders named after store to separate receipts by store)")
+    print("Subfolder naming: (Mendatory, if not entered, every files will be inside a single folder. This will create folders named after store to separate receipts by store)")
     print("  Enter the store names, separated by commas.\n Example: Walmart, Sobeys, ... ")
     storeNames = input(" Store names (Press Enter to skip): ").strip()
     
