@@ -89,32 +89,35 @@ def main():
             print(f"  SKIP {file_path.name} - could not read: {', '.join(missing)}")
             skipped += 1
             continue
-
-        storeNames = cfg.get("stores", [])
-        normalizedToOriginalStoreName = {s.replace("-","").replace(" ","").replace("'", "").lower(): s for s in storeNames}
-
+    
         cardFolder = dest / card 
         if not cardFolder.is_dir():
             cardFolder = dest / "others"
         # Just to be safe
         cardFolder.mkdir(parents=True, exist_ok=True)
 
-        target_folder = cardFolder / "unknown_store"
-        for storeName in normalizedToOriginalStoreName.keys():
-            if normalizedStore in storeName:
-                target_folder = cardFolder / normalizedToOriginalStoreName[storeName]
-                break
-        # Same here, just being extra careful
-        target_folder.mkdir(parents=True, exist_ok=True)
+        storeNames = cfg.get("stores", [])
+        normalizedStoreNamesFromConfig = {}
+        for s in storeNames:
+            normalizedStoreNamesFromConfig[s.replace("-","").replace(" ","").replace("'", "").lower()] = s
 
-        # Rename but keep the original extension
+        for k in normalizedStoreNamesFromConfig.keys():
+            if normalizedStore in k:
+                store_folder = cardFolder / normalizedStoreNamesFromConfig[k]
+        else:
+            store_folder = cardFolder / "unkownstore"
+        # Same here, just being extra careful
+        store_folder.mkdir(parents=True, exist_ok=True)
+
         ext = file_path.suffix.lower()
-        existing_names = {p.name.lower() for p in target_folder.iterdir() if p.is_file()}
+
+        # Check if the name already exist
+        existing_names = {p.name.lower() for p in store_folder.iterdir() if p.is_file()}
         new_name = pdfProcessing.build_new_filename(card, date, store, amount, existing_names, ext)
 
         try:
-            file_path.rename(target_folder / new_name)
-            print(f"  {file_path.name} -> {target_folder.name}/{new_name}")
+            file_path.rename(store_folder / new_name)
+            print(f"  {file_path.name} -> {store_folder.name}/{new_name}")
             moved += 1
         except Exception as e:
             print(f"  Failed to move {file_path.name}: {e}")

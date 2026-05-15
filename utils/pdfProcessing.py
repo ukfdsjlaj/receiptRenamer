@@ -65,7 +65,6 @@ Fields to extract:
 4. "totalAmount": The final total amount paid. Return as a number (e.g., 12.99). Do not include currency symbols like "$".
 
 CRITICAL RULES:
-- Store name must be normalized, for example, Real Atlantic Superstore -> Superstore, Macquarrie's Meats LTD -> Macquarrie's, Kays Fresh Market or Kays Wholesales -> Kays. Normalize it so only the store name is presented.
 - Respond ONLY with the raw JSON object.
 - Do not wrap the response in markdown blocks (e.g., do not use ```json).
 - Do not include any greetings, explanations, or conversational text.
@@ -113,8 +112,9 @@ def build_new_filename(card: str, date: str, store: str, amount: str, existing: 
     clean_date = str(date).replace("/", "-").replace("\\", "-")
     base = f"{stripedFilename(card)} {clean_date} {stripedFilename(store)} {amount}"
     
-    # Keep the extension
     candidate = base + ext
+    
+    # If a file with the same name exists, put a number after it. 
     counter = 1
     while candidate.lower() in existing:
         candidate = f"{base} {counter}{ext}"
