@@ -7,7 +7,6 @@
     - Automatically installs Ollama if not found
     - Automatically starts Ollama if not running
     - Automatically pulls the model if not downloaded
-    - No API key needed — runs fully on PC using Ondevice AI (Ollama)
 
     Seongjun Yoo
 """
@@ -104,6 +103,7 @@ def main():
         for k in normalizedStoreNamesFromConfig.keys():
             if normalizedStore in k:
                 store_folder = cardFolder / normalizedStoreNamesFromConfig[k]
+                break
         else:
             store_folder = cardFolder / "unkownstore"
         # Same here, just being extra careful
