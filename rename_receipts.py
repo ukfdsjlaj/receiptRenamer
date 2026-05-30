@@ -12,10 +12,11 @@
 """
 
 import sys
+import threading
 from pathlib import Path
 
 # Custom modules
-from utils import config, ollamaSetup, pdfProcessing
+from utils import config, ollamaSetup, pdfProcessing, qboAutomation
 
 def main():
     print("Receipt Auto-Renamer")
@@ -27,7 +28,7 @@ def main():
 
     # Load or create config
     cfg = config.load_config()
-    if not cfg.get("folder") or not cfg.get("dest"):
+    if not cfg.get("folder") or not cfg.get("dest") or not cfg.get("qbo_client_id") or not cfg.get("qbo_client_secret") or not cfg.get("qbo_refresh_token") or not cfg.get("qbo_realm_id"):
         cfg = config.setup_wizard(cfg)
     else:
         print(f"Source      : {cfg['folder']}")
@@ -101,7 +102,7 @@ def main():
             normalizedStoreNamesFromConfig[s.replace("-","").replace(" ","").replace("'", "").lower()] = s
 
         for k in normalizedStoreNamesFromConfig.keys():
-            if normalizedStore in k:
+            if k in normalizedStore:
                 store_folder = cardFolder / normalizedStoreNamesFromConfig[k]
                 break
         else:
@@ -114,6 +115,16 @@ def main():
         # Check if the name already exist
         existing_names = {p.name.lower() for p in store_folder.iterdir() if p.is_file()}
         new_name = pdfProcessing.build_new_filename(card, date, store, amount, existing_names, ext)
+
+        if card == "8788":
+            qbo_thread = threading.Thread(
+                target=qboAutomation.qbo_worker_thread, 
+                args=(info, cfg)
+            )
+            qbo_thread.daemon = True
+            qbo_thread.start()
+        else:
+            print(f"  [Local Archive Only] Card {card} is not business card 8788. Skipping QBO sync.")
 
         try:
             file_path.rename(store_folder / new_name)

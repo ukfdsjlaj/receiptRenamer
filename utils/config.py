@@ -82,6 +82,17 @@ def setup_wizard(config: dict) -> dict:
         else:
             print("  Folder path cannot be empty.")
     
+    print()
+    print("Required for QBO Sync:")
+    client_id = input("   Enter your client_id from QBO: ").strip()
+    client_secret = input("   Enter your client_secret from QBO: ").strip()
+    refresh_token = input("   Enter your refresh_token from QBO: ").strip()
+    realm_id = input("   Enter your realm_id from QBO: ").strip()
+
+    config["qbo_client_id"] = client_id
+    config["qbo_client_secret"] = client_secret
+    config["qbo_refresh_token"] = refresh_token
+    config["qbo_realm_id"] = realm_id
 
     print()
     print("Frequent Card Numbers (Optional, this will create folders for each card number + others folder)")
